@@ -1,0 +1,8 @@
+<?page title="Auto Generated index.zul"?>
+<window title="Hello World!!" border="normal" width="200px" apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('domainapp.webapp.zkvm.SampleVM')">
+    <html><![CDATA[<h4>Create Simple Object</h4>]]></html>
+    <label value="Name" />
+    <textbox value="@bind(vm.name)" />
+    <button onClick="@command('btnClick')" label="Save" />
+</window>
