@@ -25,6 +25,7 @@ import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.query.QueryDefault;
 import org.apache.isis.applib.services.registry.ServiceRegistry2;
 import org.apache.isis.applib.services.repository.RepositoryService;
+import org.apache.log4j.spi.DefaultRepositorySelector;
 import org.datanucleus.api.jdo.JDOQuery;
 import org.zkoss.zhtml.P;
 
@@ -35,7 +36,7 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 @DomainService(
-        nature = NatureOfService.VIEW_REST_ONLY,
+        nature = NatureOfService.DOMAIN,
         repositoryFor = SimpleObject.class
 )
 public class SimpleObjectRepository {
@@ -48,12 +49,26 @@ public class SimpleObjectRepository {
         return repositoryService.allMatches(
                 new QueryDefault<>(
                         SimpleObject.class,
-                        "findByName",
+                        "searchByName",
                         "name", name));
     }
 
+    public SimpleObject findById(final long id) {
+        return repositoryService.firstMatch(
+                new QueryDefault<>(
+                        SimpleObject.class,
+                        "findById",
+                        "id", id));
+    }
+
     public void delete(final SimpleObject simpleObject) {
-        repositoryService.remove(simpleObject);
+        SimpleObject object = findById(simpleObject.getId());
+        object.delete();
+    }
+
+    public void update(final SimpleObject simpleObject) {
+        SimpleObject object = findById(simpleObject.getId());
+        object.setNotes(simpleObject.getNotes());
     }
 
     public SimpleObject create(final String name) {

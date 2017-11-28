@@ -4,19 +4,24 @@
     <html><![CDATA[<h4>Create Simple Object</h4>]]></html>
     <label value="Name" />
     <textbox value="@bind(vm.name)" />
-    <button onClick="@command('btnClick')" label="Save" />
+    <label value="Notes" />
+    <textbox value="@bind(vm.notes)" />
+    <button onClick="@command('createObject')" label="Save" />
+    <button onClick="@command('updateObject')" label="Update" />
     <grid zclass="none" height="350px" model="@load(vm.simpleObjects)" sclass="table table-bordered"
           emptyMessage="Nothing in Inbox.">
         <columns>
+            <column label="Id" />
             <column label="Name" />
             <column label="Notes" width="80px" />
             <column label="Ctrl" width="100px" />
         </columns>
         <template name="model">
-            <row>
+            <row onClick="@command('selectObject', simpleObject = each)">
+                <label value="@load(each.id)" />
                 <label value="@load(each.name)" />
                 <label value="@load(each.notes)" />
-                <button label="Delete" onClick="@command('deleteSimpleObject', simpleObject=each)" sclass="btn btn-danger pull-right" />
+                <button label="Delete" onClick="@command('deleteObject', simpleObject=each)" sclass="btn btn-danger pull-right" />
             </row>
         </template>
     </grid>

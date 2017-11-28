@@ -18,10 +18,12 @@
  */
 package domainapp.modules.simple.dom.impl;
 
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Query;
-import javax.jdo.annotations.VersionStrategy;
+import javax.annotation.Generated;
+import javax.jdo.annotations.*;
+import javax.ws.rs.GET;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainObjectLayout;
@@ -41,26 +43,26 @@ import lombok.AccessLevel;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType=IdentityType.DATASTORE,
-        schema = "simple"
+        schema = "simple",
+        table = "SimpleObject"
 )
-@javax.jdo.annotations.DatastoreIdentity(
-        strategy=javax.jdo.annotations.IdGeneratorStrategy.IDENTITY,
-        column="id")
+//@javax.jdo.annotations.DatastoreIdentity(
+//        strategy=javax.jdo.annotations.IdGeneratorStrategy.IDENTITY,
+//        column="id")
 @javax.jdo.annotations.Version(
         strategy= VersionStrategy.DATE_TIME,
         column="version")
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
-                name = "findByName",
+                name = "searchByName",
                 value = "SELECT "
                         + "FROM domainapp.modules.simple.dom.impl.SimpleObject "
                         + "WHERE name.indexOf(:name) >= 0 "),
-        @Query(
-                name = "deleteByName",
-                value = "DELETE "
+        @javax.jdo.annotations.Query(
+                name = "findById",
+                value = "SELECT "
                         + "FROM domainapp.modules.simple.dom.impl.SimpleObject "
-                        + "WHERE name.indexOf(:name) >= 0 "
-        )
+                        + "WHERE id == :id ")
 })
 @javax.jdo.annotations.Unique(name="SimpleObject_name_UNQ", members = {"name"})
 @DomainObject() // objectType inferred from @PersistenceCapable#schema
@@ -68,6 +70,11 @@ import lombok.AccessLevel;
 @lombok.Getter @lombok.Setter
 @lombok.RequiredArgsConstructor(staticName = "create")
 public class SimpleObject implements Comparable<SimpleObject> {
+
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    @Getter @Setter
+    @PrimaryKey
+    private int id;
 
     @javax.jdo.annotations.Column(allowsNull = "false", length = 40)
     @lombok.NonNull
@@ -100,7 +107,7 @@ public class SimpleObject implements Comparable<SimpleObject> {
     //endregion
 
     //region > delete (action)
-    @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
+    @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     public void delete() {
         final String title = titleService.titleOf(this);
         messageService.informUser(String.format("'%s' deleted", title));

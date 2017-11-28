@@ -9,6 +9,7 @@ import org.apache.isis.core.runtime.system.context.IsisContext;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.ListModelList;
 
 import javax.inject.Inject;
@@ -22,6 +23,12 @@ public class SampleVM {
     private String name;
 
     @Getter @Setter
+    private String notes;
+
+    @Getter @Setter
+    private SimpleObject simpleObject;
+
+    @Getter @Setter
     private ListModelList<SimpleObject> simpleObjects;
 
     @Init
@@ -30,14 +37,33 @@ public class SampleVM {
     }
 
     @Command
-    public void btnClick() {
+    public void createObject() {
         SimpleObject simpleObject = SimpleObject.create(name);
-        createSimpleObject(simpleObject);
+        simpleObject.setNotes(notes);
+        SimpleObject s = createSimpleObject(simpleObject);
+        simpleObject.setId(s.getId());
         simpleObjects.add(simpleObject);
     }
 
     @Command
-    public void deleteSimpleObject(@BindingParam("simpleObject") final SimpleObject simpleObject){
+    @NotifyChange({"simpleObjects"})
+    public void updateObject() {
+        SimpleObject object = this.simpleObject;
+        object.setName(name);
+        object.setNotes(notes);
+        updateSimpleObjects(object);
+    }
+
+    @Command
+    @NotifyChange({"name", "notes"})
+    public void selectObject(@BindingParam("simpleObject")final SimpleObject simpleObject){
+        this.simpleObject = simpleObject;
+        name = simpleObject.getName();
+        notes = simpleObject.getNotes();
+    }
+
+    @Command
+    public void deleteObject(@BindingParam("simpleObject") final SimpleObject simpleObject){
         deleteSimpleObjects(simpleObject);
         simpleObjects.remove(simpleObject);
     }
@@ -65,13 +91,13 @@ public class SampleVM {
                 final SimpleObjectRepository simpleObjectRepository = IsisContext.getSessionFactory()
                         .getServicesInjector().lookupService(SimpleObjectRepository.class);
 
-                return simpleObjectRepository.create(simpleObject);
+                SimpleObject simpleObject1 = simpleObjectRepository.create(simpleObject);
+                return simpleObject1;
             }
         });
     }
 
     private void deleteSimpleObjects(final SimpleObject simpleObject) {
-
         IsisContext.getSessionFactory().doInSession(new Callable<Void>() {
             @Override
             public Void call() {
@@ -80,6 +106,20 @@ public class SampleVM {
                         .getServicesInjector().lookupService(SimpleObjectRepository.class);
 
                 simpleObjectRepository.delete(simpleObject);
+                return null;
+            }
+        });
+    }
+
+    private void updateSimpleObjects(final SimpleObject simpleObject) {
+        IsisContext.getSessionFactory().doInSession(new Callable<Void>() {
+            @Override
+            public Void call() {
+
+                final SimpleObjectRepository simpleObjectRepository = IsisContext.getSessionFactory()
+                        .getServicesInjector().lookupService(SimpleObjectRepository.class);
+
+                simpleObjectRepository.update(simpleObject);
                 return null;
             }
         });
