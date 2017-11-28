@@ -1,8 +1,23 @@
 <?page title="Auto Generated index.zul"?>
-<window title="Hello World!!" border="normal" width="200px" apply="org.zkoss.bind.BindComposer"
+<window title="Hello World!!" border="normal" apply="org.zkoss.bind.BindComposer"
         viewModel="@id('vm') @init('domainapp.webapp.zkvm.SampleVM')">
     <html><![CDATA[<h4>Create Simple Object</h4>]]></html>
     <label value="Name" />
     <textbox value="@bind(vm.name)" />
     <button onClick="@command('btnClick')" label="Save" />
+    <grid zclass="none" height="350px" model="@load(vm.simpleObjects)" sclass="table table-bordered"
+          emptyMessage="Nothing in Inbox.">
+        <columns>
+            <column label="Name" />
+            <column label="Notes" width="80px" />
+            <column label="Ctrl" width="100px" />
+        </columns>
+        <template name="model">
+            <row>
+                <label value="@load(each.name)" />
+                <label value="@load(each.notes)" />
+                <button label="Delete" onClick="@command('deleteSimpleObject', simpleObject=each)" sclass="btn btn-danger pull-right" />
+            </row>
+        </template>
+    </grid>
 </window>

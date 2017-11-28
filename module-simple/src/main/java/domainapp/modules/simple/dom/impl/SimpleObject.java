@@ -19,6 +19,7 @@
 package domainapp.modules.simple.dom.impl;
 
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Query;
 import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.isis.applib.annotation.Action;
@@ -53,7 +54,13 @@ import lombok.AccessLevel;
                 name = "findByName",
                 value = "SELECT "
                         + "FROM domainapp.modules.simple.dom.impl.SimpleObject "
-                        + "WHERE name.indexOf(:name) >= 0 ")
+                        + "WHERE name.indexOf(:name) >= 0 "),
+        @Query(
+                name = "deleteByName",
+                value = "DELETE "
+                        + "FROM domainapp.modules.simple.dom.impl.SimpleObject "
+                        + "WHERE name.indexOf(:name) >= 0 "
+        )
 })
 @javax.jdo.annotations.Unique(name="SimpleObject_name_UNQ", members = {"name"})
 @DomainObject() // objectType inferred from @PersistenceCapable#schema

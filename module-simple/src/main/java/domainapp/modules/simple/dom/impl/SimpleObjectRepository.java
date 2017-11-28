@@ -25,9 +25,17 @@ import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.query.QueryDefault;
 import org.apache.isis.applib.services.registry.ServiceRegistry2;
 import org.apache.isis.applib.services.repository.RepositoryService;
+import org.datanucleus.api.jdo.JDOQuery;
+import org.zkoss.zhtml.P;
+
+import javax.inject.Inject;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.Query;
 
 @DomainService(
-        nature = NatureOfService.DOMAIN,
+        nature = NatureOfService.VIEW_REST_ONLY,
         repositoryFor = SimpleObject.class
 )
 public class SimpleObjectRepository {
@@ -44,8 +52,19 @@ public class SimpleObjectRepository {
                         "name", name));
     }
 
+    public void delete(final SimpleObject simpleObject) {
+        repositoryService.remove(simpleObject);
+    }
+
     public SimpleObject create(final String name) {
-        return repositoryService.persist(SimpleObject.create(name));
+        SimpleObject object = SimpleObject.create(name);
+        create(object);
+        return object;
+    }
+
+    public SimpleObject create(final SimpleObject simpleObject) {
+        SimpleObject object = repositoryService.persist(simpleObject);
+        return object;
     }
 
     @javax.inject.Inject
